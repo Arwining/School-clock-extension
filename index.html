@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>How to Build Your Browser Extension</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; line-height: 1.5; }
+  h1 { text-align: center; }
+  h2 { margin-top: 30px; }
+  pre { background: #f0f0f0; padding: 10px; overflow-x: auto; }
+  ol { margin-top: 20px; }
+</style>
+</head>
+<body>
+<a href="https://arwining.github.io/Learning-tool-hub/">Learning-tool-hub</a>
+<h1>Step-by-Step Guide to Create Class Schedule Timer Extension</h1>
+
+<p>This guide will walk you through creating a simple browser extension that shows your next class and counts down to it. Follow each step carefully.</p>
+
+<h2>Step 1: Prepare the Files</h2>
+<p>Create a new folder on your computer, for example, <strong>MyScheduleExtension</strong>. Inside this folder, create the following files with the specified contents.</p>
+
+<h3>1. manifest.json</h3>
+<pre><code>{
+  "manifest_version": 3,
+  "name": "Class Schedule Timer",
+  "version": "1.0",
+  "description": "Shows time until next class",
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
+</code></pre>
+
+<h3>2. popup.html</h3>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8" /&gt;
+&lt;title&gt;Next Class Timer&lt;/title&gt;
+&lt;style&gt;
+  body { font-family: Arial, sans-serif; width: 200px; padding: 10px; margin: 0; background-color: #fff; }
+  h1 { font-size: 1.2em; margin: 0 0 10px 0; }
+  #schedule { margin-bottom: 10px; }
+  #time { font-size: 1.5em; font-weight: bold; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Next Class&lt;/h1&gt;
+&lt;div id="schedule"&gt;&lt;/div&gt;
+&lt;div id="time"&gt;&lt;/div&gt;
+&lt;script src="popup.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h3>3. popup.js</h3>
+<pre><code>const schedule = [
+  { name: "Math", time: "09:00" },
+  { name: "English", time: "10:30" },
+  { name: "Science", time: "13:00" },
+  { name: "History", time: "14:30" },
+  { name: "PE", time: "16:00" }
+];
+
+function getNextClass() {
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  let next = null;
+  let minDiff = Infinity;
+  for (const c of schedule) {
+    const [h, m] = c.time.split(":").map(Number);
+    const classMinutes = h * 60 + m;
+    const diff = classMinutes - nowMinutes;
+    if (diff >= 0 && diff < minDiff) {
+      minDiff = diff;
+      next = c;
+    }
+  }
+  return { class: next, minutes: minDiff };
+}
+
+function update() {
+  const next = getNextClass();
+  const scheduleDiv = document.getElementById("schedule");
+  const timeDiv = document.getElementById("time");
+  if (next.class) {
+    scheduleDiv.textContent = \`Next: \${next.class.name} at \${next.class.time}\`;
+    const h = Math.floor(next.minutes / 60);
+    const m = next.minutes % 60;
+    timeDiv.textContent = \`In \${h}h \${m}m\`;
+  } else {
+    scheduleDiv.textContent = "No more classes today!";
+    timeDiv.textContent = "";
+  }
+}
+update();
+setInterval(update, 60000);
+</code></pre>
+
+<h2>Step 2: Load the Extension</h2>
+<ol>
+  <li>Open your browser (Chrome, Edge, etc.)</li>
+  <li>Go to the extensions page:
+    <ul>
+      <li>Chrome: <code>chrome://extensions/</code></li>
+      <li>Edge: <code>edge://extensions/</code></li>
+    </ul>
+  </li>
+  <li>Enable **Developer mode** (toggle at top right).</li>
+  <li>Click **Load unpacked** and select the folder where you saved the files.</li>
+  <li>The extension icon appears in the toolbar.</li>
+  <li>Click it to see your schedule and countdown!</li>
+</ol>
+
+<h2>Notes:</h2>
+<ul>
+  <li>You don't need an icon file since it's omitted here.</li>
+  <li>You can update your code files later and reload the extension in the extensions page.</li>
+</ul>
+
+</body>
+</html>
